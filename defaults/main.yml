@@ -1,0 +1,26 @@
+---
+debian_mirror: http://deb.debian.org/debian/
+ubuntu_mirror: http://archive.ubuntu.com/ubuntu/
+
+netboot_tftp_dir: /srv/tftp
+netboot_tftp_config:
+  TFTP_USERNAME: tftp
+  TFTP_DIRECTORY: "{{ netboot_tftp_dir }}"
+  TFTP_ADDRESS: 0.0.0.0:69
+  TFTP_OPTIONS: --secure
+
+netboot_preseed_dir: /srv/https/preseed
+
+netboot_images:
+  - name: ubuntu-20.04-x86_64
+    url: "{{ ubuntu_mirror }}/dists/focal/main/installer-amd64/current/legacy-images/"
+    kernel: netboot/ubuntu-installer/amd64/linux
+    initrd: netboot/ubuntu-installer/amd64/initrd.gz
+  - name: debian-10-x86_64
+    url: "{{ debian_mirror }}/dists/buster/main/installer-amd64/current/images/"
+    kernel: netboot/debian-installer/amd64/linux
+    initrd: netboot/debian-installer/amd64/initrd.gz
+  - name: debian-11-x86_64
+    url: "{{ debian_mirror }}/dists/bullseye/main/installer-amd64/current/images/"
+    kernel: netboot/debian-installer/amd64/linux
+    initrd: netboot/debian-installer/amd64/initrd.gz

@@ -1,0 +1,101 @@
+---
+- name: Install tftpd-hpa
+  ansible.builtin.apt:
+    name: tftpd-hpa
+    state: present
+
+- name: Configure tftpd-hpa
+  ansible.builtin.template:
+    src: tftpd-hpa
+    dest: /etc/default/tftpd-hpa
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  notify: restart tftpd-hpa
+
+- name: Create tftp directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  loop:
+    - "{{ netboot_tftp_dir }}"
+    - "{{ netboot_tftp_dir }}/boot"
+    - "{{ netboot_tftp_dir }}/grub"
+
+- name: Get UEFI netboot files
+  ansible.builtin.apt:
+    name:
+      - shim-signed
+      - grub-efi-amd64-signed
+    state: present
+
+- name: Copy UEFI netboot files to tftp directory
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  loop:
+    - src: /usr/lib/shim/shimx64.efi.signed
+      dest: "{{ netboot_tftp_dir }}/bootx64.efi"
+    - src: /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed
+      dest: "{{ netboot_tftp_dir }}/grubx64.efi"
+  loop_control:
+    label: "{{ item.src }} -> {{ item.dest }}"
+
+- name: Download kernels
+  ansible.builtin.get_url:
+    url: "{{ item.url }}/{{ item.kernel }}"
+    dest: "{{ netboot_tftp_dir }}/boot/{{ item.name }}-linux"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    checksum: >-
+      {{ item.checksum_type | default('sha256') }}:{{
+      (lookup('url', item.url + '/' + item.checksums | default('SHA256SUMS'), wantlist=True)
+      | select('search', item.kernel))[0].split(' ')[0] }}
+  loop: "{{ netboot_images }}"
+  loop_control:
+    label: "{{ item.name }}-linux"
+
+- name: Download initial ramdisks
+  ansible.builtin.get_url:
+    url: "{{ item.url }}/{{ item.initrd }}"
+    dest: "{{ netboot_tftp_dir }}/boot/{{ item.name }}-initrd.gz"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    checksum: >-
+      {{ item.checksum_type | default('sha256') }}:{{
+      (lookup('url', item.url + '/' + item.checksums | default('SHA256SUMS'), wantlist=True)
+      | select('search', item.initrd))[0].split(' ')[0] }}
+  loop: "{{ netboot_images }}"
+  loop_control:
+    label: "{{ item.name }}-initrd.gz"
+
+- name: Configure grub.cfg
+  ansible.builtin.template:
+    src: grub.cfg
+    dest: "{{ netboot_tftp_dir }}/grub/grub.cfg"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: Start and enable tftpd-hpa
+  ansible.builtin.service:
+    name: tftpd-hpa
+    state: started
+    enabled: true
+
+- name: Create preseed files directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ netboot_preseed_dir }}"
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx

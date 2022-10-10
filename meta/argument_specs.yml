@@ -1,0 +1,63 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure a TFTP server for netbooting
+    options:
+      netboot_tftp_dir:
+        description: Directory containing the files served over TFTP
+        type: str
+        default: /srv/tftp
+
+      netboot_tftp_config:
+        description: TFTP configuration
+        type: dict
+        default:
+          TFTP_USERNAME: tftp
+          TFTP_DIRECTORY: /srv/tftp
+          TFTP_ADDRESS: 0.0.0.0:69
+          TFTP_OPTIONS: --secure
+
+      netboot_preseed_dir:
+        description: Directory for the debian preseed files
+        type: str
+        default: /srv/https/preseed
+
+      netboot_images:
+        description: List of debian-based images to download and serve over TFTP
+        type: list
+        elements: dict
+        options:
+          name:
+            description: Name of the image
+            type: str
+            required: true
+          url:
+            description: Base URL for the images available for the distribution version
+            type: str
+            required: true
+          kernel:
+            description: Relative path from the base URL to the kernel image
+            type: str
+            required: true
+          initrd:
+            description: Relative path from the base URL to the initial ramdisk image
+            type: str
+            required: true
+          checksums:
+            description: Relative path from the base URL to the checksums file
+            type: str
+            default: SHA256SUMS
+          checksum_type:
+            description: Type of checksums in the checksums file
+            type: str
+            default: sha256
+
+      debian_mirror:
+        description: URL for apt mirror where the debian images will be fetched from
+        type: str
+        default: http://deb.debian.org/debian/
+
+      ubuntu_mirror:
+        description: URL for apt mirror where the ubuntu images will be fetched from
+        type: str
+        default: http://archive.ubuntu.com/ubuntu/
