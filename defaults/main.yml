@@ -24,3 +24,6 @@ netboot_images:
     url: "{{ debian_mirror }}/dists/bullseye/main/installer-amd64/current/images/"
     kernel: netboot/debian-installer/amd64/linux
     initrd: netboot/debian-installer/amd64/initrd.gz
+
+netboot_grub_default_boot_entry: local_chain_hd0
+netboot_default_boot_delay: 20

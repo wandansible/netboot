@@ -17,6 +17,19 @@ OPTIONS (= is mandatory):
         [Default: http://deb.debian.org/debian/]
         type: str
 
+- netboot_default_boot_delay
+        Time (in seconds) to wait before netbooted machine boots into
+        default boot entry
+        [Default: 20]
+        type: int
+
+- netboot_grub_default_boot_entry
+        Default boot entry for grub, if no specifc host boot
+        configuration file exists
+        (Choices: local_chain_hd0, local_chain_legacy_hd0,
+        local_chain_legacy_hd1)[Default: local_chain_hd0]
+        type: str
+
 - netboot_images
         List of debian-based images to download and serve over TFTP
         [Default: (null)]
