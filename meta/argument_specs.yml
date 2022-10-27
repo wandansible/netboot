@@ -61,6 +61,18 @@ argument_specs:
           - local_chain_legacy_hd0
           - local_chain_legacy_hd1
 
+      netboot_pxelinux_default_boot_entry:
+        description: |
+          Default boot entry for pxelinux, if no specifc host boot configuration file exists
+        type: str
+        default: local
+        choices:
+          - local
+          - local_primary
+          - local_skip
+          - local_chain_hd0
+          - local_chain_hd1
+
       netboot_default_boot_delay:
         description: |
           Time (in seconds) to wait before netbooted machine boots into default boot entry
