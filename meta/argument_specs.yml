@@ -52,6 +52,21 @@ argument_specs:
             type: str
             default: sha256
 
+      netboot_grub_default_boot_entry:
+        description: Default boot entry for grub, if no specifc host boot configuration file exists
+        type: str
+        default: local_chain_hd0
+        choices:
+          - local_chain_hd0
+          - local_chain_legacy_hd0
+          - local_chain_legacy_hd1
+
+      netboot_default_boot_delay:
+        description: |
+          Time (in seconds) to wait before netbooted machine boots into default boot entry
+        type: int
+        default: 20
+
       debian_mirror:
         description: URL for apt mirror where the debian images will be fetched from
         type: str
