@@ -24,6 +24,32 @@
     - "{{ netboot_tftp_dir }}"
     - "{{ netboot_tftp_dir }}/boot"
     - "{{ netboot_tftp_dir }}/grub"
+    - "{{ netboot_tftp_dir }}/pxelinux.cfg"
+
+- name: Get BIOS netboot files
+  ansible.builtin.apt:
+    name:
+      - pxelinux
+      - syslinux-common
+    state: present
+
+- name: Copy BIOS netboot files to tftp directory
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - src: /usr/lib/PXELINUX/pxelinux.0
+      dest: "{{ netboot_tftp_dir }}/pxelinux.0"
+      mode: u=rw,g=r,o=r
+    - src: /usr/lib/syslinux/modules/bios/
+      dest: "{{ netboot_tftp_dir }}/syslinux/"
+      mode: u=rwx,g=rx,o=rx
+  loop_control:
+    label: "{{ item.src }} -> {{ item.dest }}"
 
 - name: Get UEFI netboot files
   ansible.builtin.apt:
@@ -77,6 +103,14 @@
   loop: "{{ netboot_images }}"
   loop_control:
     label: "{{ item.name }}-initrd.gz"
+
+- name: Configure pxelinux.cfg/default
+  ansible.builtin.template:
+    src: pxelinux.cfg
+    dest: "{{ netboot_tftp_dir }}/pxelinux.cfg/default"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
 
 - name: Configure grub.cfg
   ansible.builtin.template:

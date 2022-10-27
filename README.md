@@ -75,6 +75,13 @@ OPTIONS (= is mandatory):
         [Default: /srv/https/preseed]
         type: str
 
+- netboot_pxelinux_default_boot_entry
+        Default boot entry for pxelinux, if no specifc host boot
+        configuration file exists
+        (Choices: local, local_primary, local_skip, local_chain_hd0,
+        local_chain_hd1)[Default: local]
+        type: str
+
 - netboot_tftp_config
         TFTP configuration
         [Default: {'TFTP_USERNAME': 'tftp', 'TFTP_DIRECTORY':

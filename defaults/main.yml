@@ -26,4 +26,5 @@ netboot_images:
     initrd: netboot/debian-installer/amd64/initrd.gz
 
 netboot_grub_default_boot_entry: local_chain_hd0
+netboot_pxelinux_default_boot_entry: local
 netboot_default_boot_delay: 20
